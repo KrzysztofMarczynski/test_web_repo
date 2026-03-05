@@ -1,7 +1,7 @@
-// src/components/backend.jsx
+// src/components/ChatBubble.jsx
 import React from 'react';
 
-const backend = ({ message, isUser = false }) => {
+const ChatBubble = ({ message, isUser = false }) => {
   return (
     <div className={`flex items-start gap-3 ${isUser ? 'justify-end flex-row-reverse' : 'justify-start'}`}>
       {/* Awatar */}
@@ -31,4 +31,4 @@ const backend = ({ message, isUser = false }) => {
   );
 };
 
-export default backend;
+export default ChatBubble;

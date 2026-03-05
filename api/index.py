@@ -12,6 +12,3 @@ async def chat(message: Message):
     user_text = message.text
     response_text = f"Oto prosta odpowiedź: {user_text.upper()}! 😊"   # ← tu później wrzucisz prawdziwe AI (z api key)
     return {"reply": response_text}
-
-# NIE POTRZEBA tego bloku na Vercel
-# if __name__ == "__main__": ...
