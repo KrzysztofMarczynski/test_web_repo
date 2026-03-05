@@ -1,0 +1,15 @@
+{
+  "functions": {
+    "api/index.py": {
+      "runtime": "python@3.12.3",  // Ustaw wersję Pythona
+      "memory": 1024,  // Więcej RAMu na start
+      "maxDuration": 10  // Timeout 10s
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
+}
