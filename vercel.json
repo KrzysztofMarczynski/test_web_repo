@@ -13,15 +13,20 @@
   ],
   "routes": [
     {
+      "src": "/api/chat",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/api/test",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
-  ],
-  "functions": {
-    "api/index.py": {
-      "runtime": "python@3.12.3",
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  }
+  ]
 }
