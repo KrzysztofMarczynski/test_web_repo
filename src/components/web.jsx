@@ -1,6 +1,5 @@
-// src/components/web.jsx
 import React, { useState, useRef, useEffect } from "react";
-import ChatBubble from "./ChatBubble"; // ← ZMIANA: poprawna nazwa + wielka litera
+import ChatBubble from "./ChatBubble";
 
 function Web() {
   const [messages, setMessages] = useState([
@@ -13,6 +12,7 @@ function Web() {
       }),
     },
   ]);
+
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
@@ -24,24 +24,34 @@ function Web() {
       hour: "2-digit",
       minute: "2-digit",
     });
-    const newMessage = { text: input, isUser: true, time: userTime };
+
+    const newMessage = {
+      text: input,
+      isUser: true,
+      time: userTime,
+    };
 
     setMessages((prev) => [...prev, newMessage]);
+
     const currentInput = input;
     setInput("");
     setIsTyping(true);
 
     try {
-      const res = await fetch("/api", {
-        // ← ZMIANA: '/api' zamiast '/api/chat'
+      const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: currentInput }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: currentInput,
+        }),
       });
 
-      if (!res.ok) throw new Error("Błąd serwera");
+      if (!res.ok) throw new Error("Server error");
 
       const data = await res.json();
+
       const aiTime = new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -52,12 +62,14 @@ function Web() {
         isUser: false,
         time: aiTime,
       };
+
       setMessages((prev) => [...prev, aiResponse]);
     } catch (err) {
       const errorTime = new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       });
+
       setMessages((prev) => [
         ...prev,
         {
@@ -82,18 +94,19 @@ function Web() {
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 shadow-lg">
-        <h1 className="text-2xl font-extrabold text-center drop-shadow-md">
+        <h1 className="text-2xl font-extrabold text-center">
           Mega Kolorowy Chat AI 🌟
         </h1>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full space-y-4">
         {messages.map((msg, i) => (
-          <div key={i} className="animate-fade-in-up">
-            <ChatBubble message={msg.text} isUser={msg.isUser} />{" "}
-            {/* ← ZMIANA */}
+          <div key={i}>
+            <ChatBubble message={msg.text} isUser={msg.isUser} />
             <div
-              className={`text-xs text-gray-600 mt-1 ${msg.isUser ? "text-right" : "text-left"}`}
+              className={`text-xs text-gray-600 mt-1 ${
+                msg.isUser ? "text-right" : "text-left"
+              }`}
             >
               {msg.time}
             </div>
@@ -101,15 +114,13 @@ function Web() {
         ))}
 
         {isTyping && (
-          <div className="flex justify-start mb-4 animate-pulse">
+          <div className="flex justify-start mb-4">
             <div className="bg-white px-5 py-3 rounded-3xl shadow-md">
-              <span className="text-gray-500">Pisze</span>
-              <span className="dot-1">.</span>
-              <span className="dot-2">.</span>
-              <span className="dot-3">.</span>
+              <span className="text-gray-500">Pisze...</span>
             </div>
           </div>
         )}
+
         <div ref={chatEndRef} />
       </div>
 
@@ -119,15 +130,16 @@ function Web() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder="Napisz coś kolorowego... 🎨"
-            className="flex-1 px-6 py-3 rounded-full border border-purple-300 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-300 transition-all bg-gradient-to-r from-white to-purple-50 text-gray-800 placeholder-purple-400"
+            className="flex-1 px-6 py-3 rounded-full border"
           />
+
           <button
             onClick={sendMessage}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-full font-bold transition-all duration-300 shadow-md flex items-center gap-2"
+            className="bg-blue-500 text-white px-6 py-3 rounded-full"
           >
-            Wyślij <span>🚀</span>
+            Wyślij 🚀
           </button>
         </div>
       </div>
