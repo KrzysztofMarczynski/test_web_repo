@@ -6,7 +6,7 @@ app = FastAPI(title="Kolory Chat Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # potem zmień na https://twoja-domena.vercel.app
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -15,13 +15,13 @@ app.add_middleware(
 class Message(BaseModel):
     text: str
 
-@app.get("/test")
+@app.get("/api/test")
 async def test():
     return {"status": "Backend żyje! 😎"}
 
-@app.post("/")  # ← ZMIANA: root zamiast "/api/index"
+@app.post("/api/chat")
 async def chat(message: Message):
     user_text = message.text
     response_text = f"Oto prosta odpowiedź: {user_text.upper()}! 😊"
-    print(f"Otrzymano: {user_text}")  # ← pojawi się w logach Vercel!
+    print(f"Otrzymano: {user_text}")
     return {"reply": response_text}
