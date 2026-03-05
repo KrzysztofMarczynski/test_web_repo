@@ -1,85 +1,112 @@
 // src/components/web.jsx
-import React, { useState, useRef, useEffect } from 'react';
-import ChatBubble from './ChatBubble';   // ← ZMIANA: poprawna nazwa + wielka litera
+import React, { useState, useRef, useEffect } from "react";
+import ChatBubble from "./ChatBubble"; // ← ZMIANA: poprawna nazwa + wielka litera
 
 function Web() {
   const [messages, setMessages] = useState([
-    { text: "Cześć! Jestem kolorowym AI chatem 🌈. Jak mogę pomóc?", isUser: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+    {
+      text: "Cześć! Jestem kolorowym AI chatem 🌈. Jak mogę pomóc?",
+      isUser: false,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const userTime = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     const newMessage = { text: input, isUser: true, time: userTime };
-    
-    setMessages(prev => [...prev, newMessage]);
+
+    setMessages((prev) => [...prev, newMessage]);
     const currentInput = input;
-    setInput('');
+    setInput("");
     setIsTyping(true);
 
     try {
-      const res = await fetch('/api/chat', {           // ← prawdziwe wywołanie Twojego backendu
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: currentInput })
+      const res = await fetch("/api", {
+        // ← ZMIANA: '/api' zamiast '/api/chat'
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: currentInput }),
       });
 
-      if (!res.ok) throw new Error('Błąd serwera');
+      if (!res.ok) throw new Error("Błąd serwera");
 
       const data = await res.json();
-      const aiTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const aiTime = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
-      const aiResponse = { 
-        text: data.reply, 
-        isUser: false, 
-        time: aiTime 
-      };
-      setMessages(prev => [...prev, aiResponse]);
-    } catch (err) {
-      const errorTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setMessages(prev => [...prev, {
-        text: "Ups, coś poszło nie tak z AI 😢 Spróbuj jeszcze raz!",
+      const aiResponse = {
+        text: data.reply,
         isUser: false,
-        time: errorTime
-      }]);
+        time: aiTime,
+      };
+      setMessages((prev) => [...prev, aiResponse]);
+    } catch (err) {
+      const errorTime = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: "Ups, coś poszło nie tak z AI 😢 Spróbuj jeszcze raz!",
+          isUser: false,
+          time: errorTime,
+        },
+      ]);
     } finally {
       setIsTyping(false);
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') sendMessage();
+    if (e.key === "Enter") sendMessage();
   };
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 shadow-lg">
-        <h1 className="text-2xl font-extrabold text-center drop-shadow-md">Mega Kolorowy Chat AI 🌟</h1>
+        <h1 className="text-2xl font-extrabold text-center drop-shadow-md">
+          Mega Kolorowy Chat AI 🌟
+        </h1>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full space-y-4">
         {messages.map((msg, i) => (
           <div key={i} className="animate-fade-in-up">
-            <ChatBubble message={msg.text} isUser={msg.isUser} />   {/* ← ZMIANA */}
-            <div className={`text-xs text-gray-600 mt-1 ${msg.isUser ? 'text-right' : 'text-left'}`}>
+            <ChatBubble message={msg.text} isUser={msg.isUser} />{" "}
+            {/* ← ZMIANA */}
+            <div
+              className={`text-xs text-gray-600 mt-1 ${msg.isUser ? "text-right" : "text-left"}`}
+            >
               {msg.time}
             </div>
           </div>
         ))}
-        
+
         {isTyping && (
           <div className="flex justify-start mb-4 animate-pulse">
             <div className="bg-white px-5 py-3 rounded-3xl shadow-md">
               <span className="text-gray-500">Pisze</span>
-              <span className="dot-1">.</span><span className="dot-2">.</span><span className="dot-3">.</span>
+              <span className="dot-1">.</span>
+              <span className="dot-2">.</span>
+              <span className="dot-3">.</span>
             </div>
           </div>
         )}
