@@ -1,21 +1,17 @@
 # api/index.py
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
 
-app = FastAPI(title="Prosty Chat Backend")  # Tworzy aplikację FastAPI
+app = FastAPI(title="Kolorowy Chat Backend")
 
-# Model do odbierania danych (wiadomość od użytkownika)
 class Message(BaseModel):
-    text: str  # Pole 'text' typu string
+    text: str
 
-# Endpoint /chat – odbiera POST z JSON { "text": "Twoja wiadomość" }
 @app.post("/chat")
 async def chat(message: Message):
-    user_text = message.text  # Pobiera tekst od użytkownika
-    response_text = f"Oto prosta odpowiedź: {user_text.upper()}! 😊"  # Symulacja AI – np. zamienia na duże litery
-    return {"reply": response_text}  # Zwraca JSON z odpowiedzią
+    user_text = message.text
+    response_text = f"Oto prosta odpowiedź: {user_text.upper()}! 😊"   # ← tu później wrzucisz prawdziwe AI (z api key)
+    return {"reply": response_text}
 
-# Uruchomienie: uvicorn api.index:app --reload (w terminalu)
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# NIE POTRZEBA tego bloku na Vercel
+# if __name__ == "__main__": ...

@@ -1,6 +1,6 @@
 // src/components/web.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import backend from './backend';
+import ChatBubble from './ChatBubble';   // ← ZMIANA: poprawna nazwa + wielka litera
 
 function Web() {
   const [messages, setMessages] = useState([
@@ -10,56 +10,71 @@ function Web() {
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const newMessage = { 
-      text: input, 
-      isUser: true, 
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-    };
+    const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const newMessage = { text: input, isUser: true, time: userTime };
+    
     setMessages(prev => [...prev, newMessage]);
+    const currentInput = input;
     setInput('');
     setIsTyping(true);
 
-    // Symulacja odpowiedzi AI z opóźnieniem
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/chat', {           // ← prawdziwe wywołanie Twojego backendu
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: currentInput })
+      });
+
+      if (!res.ok) throw new Error('Błąd serwera');
+
+      const data = await res.json();
+      const aiTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
       const aiResponse = { 
-        text: "Super wiadomość! Oto kolorowa odpowiedź 🎉: " + input.toUpperCase(), 
+        text: data.reply, 
         isUser: false, 
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+        time: aiTime 
       };
       setMessages(prev => [...prev, aiResponse]);
+    } catch (err) {
+      const errorTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setMessages(prev => [...prev, {
+        text: "Ups, coś poszło nie tak z AI 😢 Spróbuj jeszcze raz!",
+        isUser: false,
+        time: errorTime
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') sendMessage();
   };
 
-  // Auto-scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
-      {/* Nagłówek kolorowy */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 shadow-lg">
         <h1 className="text-2xl font-extrabold text-center drop-shadow-md">Mega Kolorowy Chat AI 🌟</h1>
       </div>
 
-      {/* Okno czatu – wyśrodkowane i kolorowe */}
       <div className="flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full space-y-4">
         {messages.map((msg, i) => (
           <div key={i} className="animate-fade-in-up">
-            <backend message={msg.text} isUser={msg.isUser} />
+            <ChatBubble message={msg.text} isUser={msg.isUser} />   {/* ← ZMIANA */}
             <div className={`text-xs text-gray-600 mt-1 ${msg.isUser ? 'text-right' : 'text-left'}`}>
               {msg.time}
             </div>
           </div>
         ))}
+        
         {isTyping && (
           <div className="flex justify-start mb-4 animate-pulse">
             <div className="bg-white px-5 py-3 rounded-3xl shadow-md">
@@ -71,7 +86,6 @@ function Web() {
         <div ref={chatEndRef} />
       </div>
 
-      {/* Pole wpisu – kolorowe i animowane */}
       <div className="p-4 bg-white shadow-lg border-t max-w-3xl mx-auto w-full">
         <div className="flex gap-3">
           <input
