@@ -1,6 +1,6 @@
 // src/components/web.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import chatbubble from './chatbubble';
+import backend from './backend';
 
 function Web() {
   const [messages, setMessages] = useState([
@@ -54,7 +54,7 @@ function Web() {
       <div className="flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full space-y-4">
         {messages.map((msg, i) => (
           <div key={i} className="animate-fade-in-up">
-            <chatbubble message={msg.text} isUser={msg.isUser} />
+            <backend message={msg.text} isUser={msg.isUser} />
             <div className={`text-xs text-gray-600 mt-1 ${msg.isUser ? 'text-right' : 'text-left'}`}>
               {msg.time}
             </div>
